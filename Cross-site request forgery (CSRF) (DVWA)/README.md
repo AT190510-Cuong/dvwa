@@ -13,7 +13,7 @@
 
 - xem source code của bài này mình được
 
-```php!
+```php
 <?php
 
 if( isset( $_GET[ 'Change' ] ) ) {
@@ -126,7 +126,7 @@ vậy là chúng ta đã khai thác thành công với mức độ low level
 
 - xem source code của bài này mình được
 
-```php!
+```php
 <?php
 
 if( isset( $_GET[ 'Change' ] ) ) {
@@ -236,7 +236,7 @@ và mình thấy response thay đổi mật khẩu thành công
 
 - xem source code của bài này mình được
 
-```php!
+```php
 <?php
 
 $change = false;
@@ -396,7 +396,7 @@ nhưng mật khẩu chưa được thay đổi vì chúng ta đã thực hiện 
 - vậy còn 1 chức năng lưu code trên server nữa là file upload mình chưa thử
 - đoạn code của chức năng này như sau
 
-```php!
+```php
 
 <?php
 
@@ -493,7 +493,7 @@ và mình vào Test Credentials kiểm tra mật khẩu đã thực sự đượ
 
 đọc source code mình được
 
-```php!
+```php
 <?php
 
 if( isset( $_GET[ 'Change' ] ) ) {
