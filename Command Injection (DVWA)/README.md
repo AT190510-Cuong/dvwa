@@ -18,58 +18,33 @@
 <?php
 
 if( isset( $_POST[ 'Submit' ]  ) ) {
-    // Check Anti-CSRF token
-    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
-
     // Get input
     $target = $_REQUEST[ 'ip' ];
-    $target = stripslashes( $target );
 
-    // Split the IP into 4 octects
-    $octet = explode( ".", $target );
-
-    // Check IF each octet is an integer
-    if( ( is_numeric( $octet[0] ) ) && ( is_numeric( $octet[1] ) ) && ( is_numeric( $octet[2] ) ) && ( is_numeric( $octet[3] ) ) && ( sizeof( $octet ) == 4 ) ) {
-        // If all 4 octets are int's put the IP back together.
-        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
-
-        // Determine OS and execute the ping command.
-        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
-            // Windows
-            $cmd = shell_exec( 'ping  ' . $target );
-        }
-        else {
-            // *nix
-            $cmd = shell_exec( 'ping  -c 4 ' . $target );
-        }
-
-        // Feedback for the end user
-        echo "<pre>{$cmd}</pre>";
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        // Windows
+        $cmd = shell_exec( 'ping  ' . $target );
     }
     else {
-        // Ops. Let the user name theres a mistake
-        echo '<pre>ERROR: You have entered an invalid IP.</pre>';
+        // *nix
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
     }
-}
 
-// Generate Anti-CSRF token
-generateSessionToken();
+    // Feedback for the end user
+    echo "<pre>{$cmd}</pre>";
+}
 
 ?>
 ```
 
-Đoạn mã PHP trên có chức năng như sau:
+Đoạn mã trên là một đoạn mã PHP đơn giản thực hiện các bước sau:
 
-- Kiểm tra nếu form đã được submit bằng cách kiểm tra xem nút có tên là 'Submit' có được nhấn hay không.
-- Kiểm tra mã thông báo chống CSRF (Cross-Site Request Forgery) bằng hàm checkToken(). Nó so sánh mã thông báo mà người dùng gửi với mã thông báo được lưu trữ trong phiên hiện tại. Nếu chúng không khớp, nó sẽ chuyển hướng người dùng đến trang 'index.php'.
-- Nhận đầu vào từ trường 'ip' trong form, sau đó loại bỏ các ký tự thoát () bằng hàm stripslashes().
-- Phân tách địa chỉ IP thành 4 phần bằng dấu chấm.
-- Kiểm tra xem mỗi phần của địa chỉ IP có phải là số hay không và đảm bảo rằng có chính xác 4 phần.
-- Nếu tất cả 4 phần của địa chỉ IP là số nguyên, thì nối các phần lại thành một địa chỉ IP hoàn chỉnh.
-- Xác định hệ điều hành đang chạy và thực thi lệnh ping tới địa chỉ IP đã nhập.
-- Hiển thị kết quả ping cho người dùng.
-- Nếu địa chỉ IP không hợp lệ, thông báo lỗi sẽ được hiển thị.
-- Sau đó, mã sẽ sinh ra mã thông báo chống CSRF bằng hàm generateSessionToken(), để sử dụng cho các lần submit form sau này.
+- Nhận đầu vào từ người dùng (trong trường 'ip') bằng cách sử dụng $\_REQUEST['ip'] và lưu trữ vào biến $target.
+- Xác định hệ điều hành của máy chủ bằng cách sử dụng hàm php_uname('s'), và sau đó thực hiện lệnh ping tới địa chỉ IP được nhập bởi người dùng.
+- Đối với hệ điều hành Windows, đoạn mã sử dụng shell_exec('ping ' . $target) để thực hiện lệnh ping, trong khi đối với hệ điều hành Unix, nó sử dụng shell_exec('ping -c 4 ' . $target) để thực hiện lệnh ping với 4 gói tin.
+- Kết quả của lệnh ping được lưu vào biến $cmd.
+- Kết quả được xuất ra cho người dùng thông qua thẻ `<pre>` để hiển thị dễ đọc hơn.
 
 vậy đoạn code không có cơ chế validate lỗi command injection
 
@@ -223,5 +198,68 @@ vậy đoạn code đã lọc được hầu hết các ký tự ngắt lệnh t
 - trang web bị lọc "| " nó có khoảng trắng nên chúng ta chỉ cần viết liền thành câu lệnh `127.0.0.1|whoami` và mình khai thác thành công
 
 ![image](https://hackmd.io/_uploads/Sykw4SbeC.png)
+
+## IMPOSSIBLE LEVEL
+
+### Phân tích
+
+- đọc source code mình được:
+
+```php
+<?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+    $target = stripslashes( $target );
+
+    // Split the IP into 4 octects
+    $octet = explode( ".", $target );
+
+    // Check IF each octet is an integer
+    if( ( is_numeric( $octet[0] ) ) && ( is_numeric( $octet[1] ) ) && ( is_numeric( $octet[2] ) ) && ( is_numeric( $octet[3] ) ) && ( sizeof( $octet ) == 4 ) ) {
+        // If all 4 octets are int's put the IP back together.
+        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
+
+        // Determine OS and execute the ping command.
+        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+            // Windows
+            $cmd = shell_exec( 'ping  ' . $target );
+        }
+        else {
+            // *nix
+            $cmd = shell_exec( 'ping  -c 4 ' . $target );
+        }
+
+        // Feedback for the end user
+        echo "<pre>{$cmd}</pre>";
+    }
+    else {
+        // Ops. Let the user name theres a mistake
+        echo '<pre>ERROR: You have entered an invalid IP.</pre>';
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?>
+```
+
+Đoạn mã trên là một đoạn mã PHP thực hiện các bước sau:
+
+- Kiểm tra xem nút gửi (Submit) đã được nhấn hay chưa bằng cách sử dụng hàm isset($\_POST['Submit']). Điều này ngụ ý rằng đoạn mã này được thiết kế để xử lý khi biểu mẫu được gửi đi.
+- Kiểm tra token chống CSRF (Cross-Site Request Forgery) bằng cách sử dụng hàm checkToken(). Điều này giúp ngăn chặn tấn công CSRF bằng cách so sánh token gửi đi từ người dùng với token được lưu trong phiên (session).
+- Nhận đầu vào từ người dùng (trong trường 'ip') và loại bỏ các ký tự đặc biệt bằng hàm stripslashes().
+- Chia địa chỉ IP thành 4 phần bằng cách sử dụng hàm explode(".", $target).
+- Kiểm tra xem từng phần của địa chỉ IP có phải là số nguyên không bằng cách sử dụng hàm is_numeric() và kiểm tra xem có đủ 4 phần không bằng cách sử dụng sizeof($octet) == 4.
+- Nếu tất cả các phần của địa chỉ IP đều là số nguyên, đoạn mã sẽ ghép các phần lại để tạo lại địa chỉ IP.
+- Xác định hệ điều hành và thực hiện lệnh ping tới địa chỉ IP đó. Đối với Windows, đoạn mã sử dụng `shell_exec('ping ' . $target)` và đối với hệ điều hành Unix, nó sử dụng shell_exec('ping -c 4 ' . $target).
+- Xuất kết quả của lệnh ping ra cho người dùng xem thông qua thẻ `<pre>`.
+- Nếu địa chỉ IP không hợp lệ (không phải là số nguyên hoặc không đủ 4 phần), thông báo lỗi sẽ được xuất ra.
+- Ngoài ra, đoạn mã cũng bao gồm hàm generateSessionToken() để tạo token phiên mới để ngăn chặn các tấn công CSRF.
 
 <img  src="https://3198551054-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FVvHHLY2mrxd5y4e2vVYL%2Fuploads%2FF8DJirSFlv1Un7WBmtvu%2Fcomplete.gif?alt=media&token=045fd197-4004-49f4-a8ed-ee28e197008f">
